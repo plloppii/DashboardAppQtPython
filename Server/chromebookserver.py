@@ -18,6 +18,7 @@ class GigabotThread(Thread):
         self.ipaddress = ip 
         self.port = port 
         self.machine = mach
+        self.printstuff = ""
         print "A new Gigabot Client connected! \n"
 
 #   Main while loop of the GigabotThread
@@ -26,7 +27,9 @@ class GigabotThread(Thread):
         while True : 
             try:
                 c_data = self.recvdata()
-                if(c_data): self.machine.parsedata(c_data)
+                if(c_data): 
+                    self.printstuff = self.machine.parsedata(c_data)
+                    print(self.printstuff)
 
                 self.senddata("OK")  # echo
             except error, exc:

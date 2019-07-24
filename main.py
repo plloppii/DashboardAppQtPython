@@ -3,7 +3,8 @@ import sys
 
 from PySide2 import QtCore, QtGui, QtWidgets
 from mainwindow import *
-from Server.mainhand import mainhandler
+from Server.main import mainhandler
+import time
 
 #class dashboard(QtWidgets.QWidget):
 #    def __init__(self, parent= None):
@@ -16,6 +17,17 @@ from Server.mainhand import mainhandler
 #        self.connect(self.runpyscript, QtCore.SIGNAL("clicked()"),
 #                    QtWidgets.qApp, QtCore.SLOT("quit()"))
 
+class updateview(QtCore.QThread):
+    def __init__(self, handler, view, parent=None):
+        QtCore.QThread.__init__(self,parent)
+        self.view = view
+        self.handler = handler
+    def run(self):
+        while(True):
+            if self.handler.message != "":
+                self.view.refresh_text_box(serv.message)
+            QtWidgets.QApplication.processEvents()
+            time.sleep(0.5)
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -30,7 +42,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
+    serv = mainhandler()
+    window.refresh_text_box(serv.message)
+    serv.message = ""
+
+    view_object = updateview(serv, window)
+    view_object.start()
+
     window.show()
 
-
-    sys.exit(app.exec_())
+    app.exec_()
+    #sys.exit(app.exec_())
